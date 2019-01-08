@@ -170,17 +170,17 @@ public class NinaTableTest {
         tableRowAry = table.newQuery("k_int_s").gt("int_col",122).eq("int_col",123).lt("int_col",122).select();
         assertTrue("", tableRowAry.length==0);
 
-        tableRowAry = table.newQuery("k_float_s").gt("int_col",122f).lt("int_col",124f).select();
+        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).lt("float_col",124f).select();
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gt("int_col",122f).eq("int_col",123f,0.001f).lt("int_col",124f).select();
+        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).eq("float_col",123f,0.001f).lt("float_col",124f).select();
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gte("int_col",122f).eq("int_col",123f,0.001f).lte("int_col",124f).select();
+        tableRowAry = table.newQuery("k_float_s").gte("float_col",122f).eq("float_col",123f,0.001f).lte("float_col",124f).select();
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gt("int_col",124f).eq("int_col",123f,0.001f).lt("int_col",124f).select();
+        tableRowAry = table.newQuery("k_float_s").gt("float_col",124f).eq("float_col",123f,0.001f).lt("float_col",124f).select();
         assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").gt("int_col",122f).eq("int_col",321f,0.001f).lt("int_col",124f).select();
+        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).eq("float_col",321f,0.001f).lt("float_col",124f).select();
         assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").gt("int_col",122f).eq("int_col",123f,0.001f).lt("int_col",122f).select();
+        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).eq("float_col",123f,0.001f).lt("float_col",122f).select();
         assertTrue("", tableRowAry.length==0);
     }
 }
