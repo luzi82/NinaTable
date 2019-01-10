@@ -5,182 +5,310 @@ import org.junit.Test;
 public class NinaTableTest {
     @Test
     public void testCreateTable() {
-        Table.newTable()
-            .addColumn("int_col", Table.DataType.INTEGER)
-            .addColumn("string_col", Table.DataType.STRING)
-            .addColumn("float_col", Table.DataType.FLOAT)
-            .create()
-        ;
+        TableDefination tableDefination = new TableDefination();
+        tableDefination.addColumn("int_col", TableDefination.DataType.INTEGER);
+        tableDefination.addColumn("string_col", TableDefination.DataType.STRING);
+        tableDefination.addColumn("float_col", TableDefination.DataType.FLOAT);
+        
+        new Table(tableDefination);
     }
     
     @Test
     public void testInsertRow() {
-        Table table = Table.newTable()
-            .addColumn("int_col", Table.DataType.INTEGER)
-            .addColumn("string_col", Table.DataType.STRING)
-            .addColumn("float_col", Table.DataType.FLOAT)
-            .create()
-        ;
+        TableDefination tableDefination = new TableDefination();
+        tableDefination.addColumn("int_col", TableDefination.DataType.INTEGER);
+        tableDefination.addColumn("string_col", TableDefination.DataType.STRING);
+        tableDefination.addColumn("float_col", TableDefination.DataType.FLOAT);
+        
+        Table table = new Table(tableDefination);
         
         assertTrue("", table.rowCount()==0);
         
-        table.newRow()
-            .setColumn("int_col", 123)
-            .setColumn("string_col", "123")
-            .setColumn("float_col", 1.23f)
-            .insert();
-
+        TableRow tableRow = new TableRow(tableDefination);
+        tableRow.setColumn("int_col", 123);
+        tableRow.setColumn("string_col", "123");
+        tableRow.setColumn("float_col", 1.23f);
+        table.insert(tableRow);
+        
         assertTrue("", table.rowCount()==1);
     }
 
     @Test
     public void testQueryTable0() {
-        Table table = Table.newTable()
-            .addColumn("int_col", Table.DataType.INTEGER)
-            .addColumn("string_col", Table.DataType.STRING)
-            .addColumn("float_col", Table.DataType.FLOAT)
-            .newIndex("k_int_s"   ).addColumn("int_col",    Table.IndexOrderType.SORT).add()
-            .newIndex("k_int_h"   ).addColumn("int_col",    Table.IndexOrderType.HASH).add()
-            .newIndex("k_string_h").addColumn("string_col", Table.IndexOrderType.HASH).add()
-            .newIndex("k_float_s" ).addColumn("float_col",  Table.IndexOrderType.SORT).add()
-            .create()
-        ;
+        TableDefination tableDefination = new TableDefination();
+        tableDefination.addColumn("int_col", TableDefination.DataType.INTEGER);
+        tableDefination.addColumn("string_col", TableDefination.DataType.STRING);
+        tableDefination.addColumn("float_col", TableDefination.DataType.FLOAT);
+        
+        TableIndex tableIndex;
+        tableIndex=new TableIndex("k_int_s");
+        tableIndex.addColumn("int_col", TableIndex.OrderType.SORT);
+        tableDefination.addIndex(tableIndex);
+        tableIndex=new TableIndex("k_int_h");
+        tableIndex.addColumn("int_col", TableIndex.OrderType.HASH);
+        tableDefination.addIndex(tableIndex);
+        tableIndex=new TableIndex("k_string_h");
+        tableIndex.addColumn("string_col", TableIndex.OrderType.HASH);
+        tableDefination.addIndex(tableIndex);
+        tableIndex=new TableIndex("k_float_s");
+        tableIndex.addColumn("float_col", TableIndex.OrderType.SORT);
+        tableDefination.addIndex(tableIndex);
+
+        Table table = new Table(tableDefination);
         
         assertTrue("", table.rowCount()==0);
         
-        table.newRow()
-            .setColumn("int_col", 123)
-            .setColumn("string_col", "123")
-            .setColumn("float_col", 123f)
-            .insert()
-        ;
+        TableRow tableRow = new TableRow(tableDefination);
+        tableRow.setColumn("int_col", 123);
+        tableRow.setColumn("string_col", "123");
+        tableRow.setColumn("float_col", 1.23f);
+        table.insert(tableRow);
 
         assertTrue("", table.rowCount()==1);
         
         TableRow[] tableRowAry;
+        
+        TableQuery tableQuery;
 
-        tableRowAry = table.newQuery("k_int_s").eq("int_col",123).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addEqual("int_col",123);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").eq("int_col",123).select();
-        assertTrue("", tableRowAry.length==0);
-
-        tableRowAry = table.newQuery("k_int_s").lt("int_col",122).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_int_s").lt("int_col",123).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_int_s").lt("int_col",124).select();
-        assertTrue("", tableRowAry.length==1);
-
-        tableRowAry = table.newQuery("k_int_s").lte("int_col",122).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_int_s").lte("int_col",123).select();
-        assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").lte("int_col",124).select();
-        assertTrue("", tableRowAry.length==1);
-
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",122).select();
-        assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",123).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",124).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addEqual("int_col",321);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
 
-        tableRowAry = table.newQuery("k_int_s").gte("int_col",122).select();
-        assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").gte("int_col",123).select();
-        assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").gte("int_col",124).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",122);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
-
-        tableRowAry = table.newQuery("k_string_h").eq("string_col","123").select();
-        assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_string_h").eq("string_col","321").select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",123);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
-
-        tableRowAry = table.newQuery("k_float_s").eq("float_col",123f,0.001f).select();
-        assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").eq("float_col",321f,0.001f).select();
-        assertTrue("", tableRowAry.length==0);
-
-        tableRowAry = table.newQuery("k_float_s").lt("float_col",122f).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").lt("float_col",123f).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").lt("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",124);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
 
-        tableRowAry = table.newQuery("k_float_s").lte("float_col",122f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLessEqual("int_col",122);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").lte("float_col",123f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLessEqual("int_col",123);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").lte("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLessEqual("int_col",124);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
 
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addGreater("int_col",122);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",123f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addGreater("int_col",123);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addGreater("int_col",124);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
 
-        tableRowAry = table.newQuery("k_float_s").gte("float_col",122f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addGreaterEqual("int_col",122);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gte("float_col",123f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addGreaterEqual("int_col",123);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gte("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addGreaterEqual("int_col",124);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+
+        tableQuery = new TableQuery(TableDefination, "k_string_h");
+        tableQuery.addEqual("string_col","123");
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_string_h");
+        tableQuery.addEqual("string_col","321");
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addEqual("float_col",123f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addEqual("float_col",321f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",122f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",123f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",124f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLessEqual("float_col",122f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLessEqual("float_col",123f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLessEqual("float_col",124f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addGreater("float_col",122f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addGreater("float_col",123f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addGreater("float_col",124f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==0);
+
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addGreaterEqual("float_col",122f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addGreaterEqual("float_col",123f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addGreaterEqual("float_col",124f);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==0);
     }
 
     @Test
     public void testQueryTable1() {
-        Table table = Table.newTable()
-            .addColumn("int_col", Table.DataType.INTEGER)
-            .addColumn("string_col", Table.DataType.STRING)
-            .addColumn("float_col", Table.DataType.FLOAT)
-            .newIndex("k_int_s"   ).addColumn("int_col",    Table.IndexOrderType.SORT).add()
-            .newIndex("k_int_h"   ).addColumn("int_col",    Table.IndexOrderType.HASH).add()
-            .newIndex("k_string_h").addColumn("string_col", Table.IndexOrderType.HASH).add()
-            .newIndex("k_float_s" ).addColumn("float_col",  Table.IndexOrderType.SORT).add()
-            .create()
-        ;
+        TableDefination tableDefination = new TableDefination();
+        tableDefination.addColumn("int_col", TableDefination.DataType.INTEGER);
+        tableDefination.addColumn("string_col", TableDefination.DataType.STRING);
+        tableDefination.addColumn("float_col", TableDefination.DataType.FLOAT);
+        
+        TableIndex tableIndex;
+        tableIndex=new TableIndex("k_int_s");
+        tableIndex.addColumn("int_col", TableIndex.OrderType.SORT);
+        tableDefination.addIndex(tableIndex);
+        tableIndex=new TableIndex("k_int_h");
+        tableIndex.addColumn("int_col", TableIndex.OrderType.HASH);
+        tableDefination.addIndex(tableIndex);
+        tableIndex=new TableIndex("k_string_h");
+        tableIndex.addColumn("string_col", TableIndex.OrderType.HASH);
+        tableDefination.addIndex(tableIndex);
+        tableIndex=new TableIndex("k_float_s");
+        tableIndex.addColumn("float_col", TableIndex.OrderType.SORT);
+        tableDefination.addIndex(tableIndex);
+
+        Table table = new Table(tableDefination);
         
         assertTrue("", table.rowCount()==0);
         
-        table.newRow()
-            .setColumn("int_col", 123)
-            .setColumn("string_col", "123")
-            .setColumn("float_col", 123f)
-            .insert()
-        ;
+        TableRow tableRow = new TableRow(tableDefination);
+        tableRow.setColumn("int_col", 123);
+        tableRow.setColumn("string_col", "123");
+        tableRow.setColumn("float_col", 1.23f);
+        table.insert(tableRow);
 
         assertTrue("", table.rowCount()==1);
         
         TableRow[] tableRowAry;
+        
+        TableQuery tableQuery;
 
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",122).lt("int_col",124).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",122);
+        tableQuery.addGreater("int_col",124);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",122).eq("int_col",123).lt("int_col",124).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",122);
+        tableQuery.addEqual("int_col",123);
+        tableQuery.addGreater("int_col",124);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").gte("int_col",122).eq("int_col",123).lte("int_col",124).select();
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLessEqual("int_col",122);
+        tableQuery.addEqual("int_col",123);
+        tableQuery.addGreaterEqual("int_col",124);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",124).eq("int_col",123).lt("int_col",124).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",122).eq("int_col",321).lt("int_col",124).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_int_s").gt("int_col",122).eq("int_col",123).lt("int_col",122).select();
-        assertTrue("", tableRowAry.length==0);
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",124);
+        tableQuery.addEqual("int_col",123);
+        tableQuery.addGreater("int_col",124);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",122);
+        tableQuery.addEqual("int_col",321);
+        tableQuery.addGreater("int_col",124);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_int_s");
+        tableQuery.addLess("int_col",122);
+        tableQuery.addEqual("int_col",123);
+        tableQuery.addGreater("int_col",122);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
 
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).lt("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",122f);
+        tableQuery.addGreater("float_col",124f);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).eq("float_col",123f,0.001f).lt("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",122f);
+        tableQuery.addEqual("float_col",123f);
+        tableQuery.addGreater("float_col",124f);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gte("float_col",122f).eq("float_col",123f,0.001f).lte("float_col",124f).select();
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLessEqual("float_col",122f);
+        tableQuery.addEqual("float_col",123f);
+        tableQuery.addGreaterEqual("float_col",124f);
+        tableRowAry = table.select(tableQuery);
         assertTrue("", tableRowAry.length==1);
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",124f).eq("float_col",123f,0.001f).lt("float_col",124f).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).eq("float_col",321f,0.001f).lt("float_col",124f).select();
-        assertTrue("", tableRowAry.length==0);
-        tableRowAry = table.newQuery("k_float_s").gt("float_col",122f).eq("float_col",123f,0.001f).lt("float_col",122f).select();
-        assertTrue("", tableRowAry.length==0);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",124f);
+        tableQuery.addEqual("float_col",123f);
+        tableQuery.addGreater("float_col",124f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",122f);
+        tableQuery.addEqual("float_col",321f);
+        tableQuery.addGreater("float_col",124f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
+        tableQuery = new TableQuery(TableDefination, "k_float_s");
+        tableQuery.addLess("float_col",122f);
+        tableQuery.addEqual("float_col",123f);
+        tableQuery.addGreater("float_col",122f);
+        tableRowAry = table.select(tableQuery);
+        assertTrue("", tableRowAry.length==1);
     }
 }
